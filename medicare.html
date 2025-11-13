@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>💊 MediCare | Unified Platform</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #a1c4fd, #c2e9fb);
+      min-height: 100vh;
+    }
+    header {
+      background: rgba(0, 123, 255, 0.9);
+      color: white;
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      gap: 6px;
+    }
+    .brand-name { color: #ffeb3b; }
+    section { display: none; padding: 20px; }
+    .active { display: block; }
+    nav a {
+      margin-right: 15px;
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    form { max-width: 400px; margin: auto; display: flex; flex-direction: column; }
+    input, button { margin: 8px 0; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background: #007bff; color: white; cursor: pointer; border: none; }
+    button:hover { background: #0056b3; }
+    footer { text-align: center; padding: 10px; color: #333; }
+    .login-box { background: white; width: 300px; margin: 100px auto; padding: 20px; border-radius: 15px; text-align: center; }
+    ul { list-style: none; padding: 0; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">💊 <span class="brand-name">MediCare</span></div>
+</header>
+
+<!-- Login Section -->
+<section id="login" class="active">
+  <div class="login-box">
+    <h2>Welcome Back 👋</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <a href="#" onclick="registerUser()">Don’t have an account? Register</a>
+  </div>
+</section>
+
+<!-- Home Section -->
+<section id="home">
+  <h1>Medicine Donation & Request Platform</h1>
+  <p>Donate unused medicines or request what you need.</p>
+  <nav>
+    <a href="#" onclick="showSection('donor')">Donate Medicine</a>
+    <a href="#" onclick="showSection('receiver')">Request Medicine</a>
+    <a href="#" onclick="showSection('admin')">Admin Panel</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+  <h3>About the Platform</h3>
+  <p>This platform connects donors and receivers based on medicine and location.</p>
+</section>
+
+<!-- Donor Section -->
+<section id="donor">
+  <h2>Donate Medicines</h2>
+  <form id="donorForm">
+    <input id="donorName" placeholder="Your Name" required />
+<input id="donorMobile" placeholder="Enter 10-digit Mobile Number" pattern="^[0-9]{10}$" title="Enter a valid 10-digit mobile number" required />
+<input id="medName" placeholder="Medicine Name" required />
+    <input id="quantity" type="number" placeholder="Quantity" required />
+    <input id="expiry" type="date" required />
+    <input id="location" placeholder="Location" required />
+    <button type="submit">Submit Donation</button>
+  </form>
+  <p id="donorMsg"></p>
+  <button onclick="showSection('home')">⬅ Back</button>
+</section>
+
+<!-- Receiver Section -->
+<section id="receiver">
+  <h2>Request Medicines</h2>
+  <form id="receiverForm">
+    <input id="receiverName" placeholder="Your Name" required />
+   <input id="donorMobile" placeholder="Enter 10-digit Mobile Number" pattern="^[0-9]{10}$" title="Enter a valid 10-digit mobile number" required />
+ <input id="reqMed" placeholder="Medicine Needed" required />
+    <input id="reqQty" type="number" placeholder="Quantity Needed" required />
+    <input id="reqLocation" placeholder="Location" required />
+    <button type="submit">Submit Request</button>
+  </form>
+  <p id="receiverMsg"></p>
+  <button onclick="showSection('home')">⬅ Back</button>
+</section>
+
+<!-- Admin Section -->
+<section id="admin">
+  <h2>Admin Panel</h2>
+  <button onclick="loadAdminData()">🔄 Refresh Data</button>
+  <h3>🧾 Donations</h3>
+  <ul id="donorList"></ul>
+  <h3>📋 Requests</h3>
+  <ul id="receiverList"></ul>
+  <h3>🤝 Matches</h3>
+  <ul id="matchList"></ul>
+  <button onclick="showSection('home')">⬅ Back</button>
+</section>
+
+<footer>©️ 2025 MediCare Platform</footer>
+
+<script>
+// Utility
+function showSection(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function logout() {
+  showSection('login');
+}
+
+// Login/Registration
+const users = JSON.parse(localStorage.getItem('users')) || [];
+document.getElementById('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const u = username.value.trim(), p = password.value.trim();
+  const found = users.find(x => x.username===u && x.password===p);
+  if(found) showSection('home'); else alert('Invalid credentials');
+});
+function registerUser(){
+  const u=prompt('Enter username:'), p=prompt('Enter password:');
+  if(u&&p){users.push({username:u,password:p});localStorage.setItem('users',JSON.stringify(users));alert('Registered!');}
+}
+
+// Donor Form
+const donorForm=document.getElementById('donorForm');
+const donorMsg=document.getElementById('donorMsg');
+donorForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const donors=JSON.parse(localStorage.getItem('donors'))||[];
+  donors.push({
+    name:donorName.value,mobile:donorMobile.value,med:medName.value.toLowerCase(),qty:quantity.value,expiry:expiry.value,loc:location.value.toLowerCase()
+  });
+  localStorage.setItem('donors',JSON.stringify(donors));
+  donorMsg.textContent='Donation saved!'; donorMsg.style.color='green'; donorForm.reset();
+});
+
+// Receiver Form
+const receiverForm=document.getElementById('receiverForm');
+const receiverMsg=document.getElementById('receiverMsg');
+receiverForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const receivers=JSON.parse(localStorage.getItem('receivers'))||[];
+  receivers.push({
+    name:receiverName.value,mobile:receiverMobile.value,med:reqMed.value.toLowerCase(),qty:reqQty.value,loc:reqLocation.value.toLowerCase()
+  });
+  localStorage.setItem('receivers',JSON.stringify(receivers));
+  receiverMsg.textContent='Request saved!'; receiverMsg.style.color='green'; receiverForm.reset();
+});
+
+// Admin Panel Data
+function loadAdminData(){
+  const donors=JSON.parse(localStorage.getItem('donors'))||[];
+  const receivers=JSON.parse(localStorage.getItem('receivers'))||[];
+  donorList.innerHTML=donors.map(d=>`<li>${d.name} (${d.mobile}) → ${d.med} - ${d.qty} pcs @ ${d.loc}</li>`).join('')||'<li>No donors</li>';
+  receiverList.innerHTML=receivers.map(r=>`<li>${r.name} (${r.mobile}) → ${r.med} - ${r.qty} pcs @ ${r.loc}</li>`).join('')||'<li>No requests</li>';
+  const matches=[];
+  donors.forEach(d=>receivers.forEach(r=>{
+    if(d.med===r.med && d.loc===r.loc){matches.push(`${d.med} @ ${d.loc} — Donor: ${d.name} → Receiver: ${r.name}`);}
+  }));
+  matchList.innerHTML=matches.map(m=>`<li>${m}</li>`).join('')||'<li>No matches yet</li>';
+}
+</script>
+</body>
+</html>
